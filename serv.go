@@ -53,7 +53,10 @@ func action(c *cli.Context) error {
 	}
 
 	serv := load.Config{}
-	load.GetConfig(c.GlobalString("file"), &serv)
+	if err := load.GetConfig(c.GlobalString("file"), &serv); err != nil {
+		return err
+	}
+
 	verify.Groups(serv.Order, serv.Groups)
 	command.Groups(serv.Order, serv.Groups)
 

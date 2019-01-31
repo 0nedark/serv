@@ -3,8 +3,8 @@ package command
 import (
 	"sync"
 
-	"github.com/drupsys/serv/src/command/operation"
-	"github.com/drupsys/serv/src/load"
+	"github.com/0nedark/serv/src/command/operation"
+	"github.com/0nedark/serv/src/load"
 )
 
 func commandGroup(service []load.Service) {

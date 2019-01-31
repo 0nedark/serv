@@ -6,9 +6,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	cli "gopkg.in/urfave/cli.v1"
 
-	"github.com/drupsys/serv/src/command"
-	"github.com/drupsys/serv/src/load"
-	"github.com/drupsys/serv/src/verify"
+	"github.com/0nedark/serv/src/command"
+	"github.com/0nedark/serv/src/load"
+	"github.com/0nedark/serv/src/verify"
 )
 
 func main() {

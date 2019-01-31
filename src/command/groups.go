@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/drupsys/serv/src/load"
+	"github.com/0nedark/serv/src/load"
 	log "github.com/sirupsen/logrus"
 )
 

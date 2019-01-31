@@ -3,7 +3,7 @@ package verify
 import (
 	"sync"
 
-	"github.com/drupsys/serv/src/load"
+	"github.com/0nedark/serv/src/load"
 )
 
 func verifyGroup(group []load.Service) {

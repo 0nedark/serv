@@ -3,8 +3,8 @@ package verify
 import (
 	"sync"
 
-	"github.com/drupsys/serv/src/clone"
-	"github.com/drupsys/serv/src/load"
+	"github.com/0nedark/serv/src/clone"
+	"github.com/0nedark/serv/src/load"
 
 	log "github.com/sirupsen/logrus"
 	git "gopkg.in/src-d/go-git.v4"

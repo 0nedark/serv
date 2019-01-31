@@ -1,18 +1,14 @@
 package command
 
 import (
-	"fmt"
-
 	"github.com/drupsys/serv/src/load"
+	log "github.com/sirupsen/logrus"
 )
 
 // Groups to be started
 func Groups(order []string, groups map[string][]load.Service) {
 	for _, key := range order {
-		fmt.Printf("\n\t:%s:\n\n", key)
-
+		log.WithField("name", key).Warn("Running group")
 		commandGroup(groups[key])
 	}
-
-	fmt.Println()
 }

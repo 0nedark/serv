@@ -62,7 +62,7 @@ fields `url` and `path`. The two optional fields can be used to define a reposit
 defines repository url and `path` specifies where to clone the repository. If your repository is private you should
 still be able to clone it as long as you use the `ssh` repo `url` and you have `ssh-agent` running with your credentials
 added with `ssh-add`. In addition, `path` is also used to define the context in which all commands will be executed for
-this service, `path` must be specified if `url` is specified but is optional otherwise. If no `path` is provided then
+this service, `path` and `url` must be provided together and you can't provide `path` on it's own. If no `path` is provided then
 the current working directory will be used as the context.
 
 #### Command

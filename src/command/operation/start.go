@@ -16,6 +16,7 @@ func Start(service load.Service, lock *sync.WaitGroup) {
 	})
 
 	command := exec.Command(service.Command.Name, service.Command.Args...)
+	command.Dir = buildPath(service.Path)
 	if stdout, err := command.Output(); err != nil {
 		logWithFields.WithError(err).Fatal("Service boot failed")
 	} else {

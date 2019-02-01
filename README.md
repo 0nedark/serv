@@ -3,7 +3,8 @@
 `serv` is a helper cli application used to simplify and coordinate the startup of multiple services, all you need to do
 is define a yaml file with the list of comments to execute.
 
-### Key Features
+## Key Features
+
 * Clone repositories automatically into the specified folder if git project haven't been cloned yet.
 * Specify a start up command for each repository
 * Specify multiple health check commands for each repository
@@ -11,9 +12,19 @@ is define a yaml file with the list of comments to execute.
 * Block the execution of command groups while health checks and post conditions are executing
 * Ability to run app in verbose mode as well as in silent mode.
 
-### Key Concepts
+## Installation
 
-#### Serv Configuration
+Install golang on your operating system and simply run `go get -u github.com/0nedark/serv` to install `serv`.
+
+## Verify installation
+
+To test that `serv` is installed correctly run `which serv` you should see the path where the application is installed.
+If `which serv` produces no output then you probably need to `export PATH=$PATH:$GOPATH/bin` add this export to your
+`~/.bashrc` or equivalent.
+
+## Configuration
+
+#### serv.yml configuration
 
 ```yaml
 order: ['group_a', 'group_b']
@@ -24,11 +35,11 @@ groups:
 
 The start up of services is configured with the `serv.yaml` file. The root of this yaml file defines `order`, `groups`
 
-#### Order
+#### order
 Order is an array of string where each string refers to a specific group. This is used to define te order in which
 groups are executed.
 
-#### Groups
+#### groups
 
 ```yaml
 group_a:
@@ -47,7 +58,7 @@ Groups are a key value pair where the key is the name of the group and the value
 are executed sequentially in the `order` defined. Consecutive group is not executed until all health checks and post
 conditions of the current group pass.
 
-#### Service
+#### service
 
 ```yaml
 - url: git@github.com:0nedark/repo-name.git
@@ -65,7 +76,7 @@ added with `ssh-add`. In addition, `path` is also used to define the context in 
 this service, `path` and `url` must be provided together and you can't provide `path` on it's own. If no `path` is provided then
 the current working directory will be used as the context.
 
-#### Command
+#### command
 ```yaml
 command:
   name: echo
@@ -75,7 +86,7 @@ Command defines a single command to be executed together with it's arguments, `n
 and `args` defines an array of strings where each string is an argument passed to the cli command. This should be used
 to run you startup script. If this command fails `serv` will terminate with error.
 
-#### Healthchecks
+#### healthchecks
 ```yaml
 healthchecks:
   - name: echo
@@ -93,7 +104,7 @@ check command in the current `group` is executed in parallel, repeatedly, every 
 either returns with success or a `timeout` is reached. If any of the health checks fail `serv` will terminate with
 error.
 
-#### Postconditions
+#### postconditions
 A list of commands that are executed as soon as the `healthchecks` return with no errors. Each post condition command in
 the current `group` is executed in parallel. If any of the post conditions fail `serv` will terminate with error.
 

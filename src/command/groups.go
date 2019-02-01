@@ -8,7 +8,7 @@ import (
 // Groups to be started
 func Groups(order []string, groups map[string][]load.Service) {
 	for _, key := range order {
-		log.WithField("name", key).Warn("Running group")
+		log.WithField("name", key).Info("Running group")
 		commandGroup(groups[key])
 	}
 }

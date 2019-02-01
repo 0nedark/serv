@@ -25,18 +25,20 @@ func Healthchecks(service load.Service, lock *sync.WaitGroup) {
 }
 
 func healthcheckInit(path string, hc load.Healthcheck, lock *sync.WaitGroup) {
-	timeout := time.Duration(hc.Timeout) * time.Second
-	result := make(chan bool)
-	go healthcheckLoop(result, path, hc)
-
 	logWithFields := log.WithFields(log.Fields{
 		"command": hc.Name,
 		"args":    hc.Args,
 	})
 
+	logWithFields.Info("Healthcheck started")
+
+	timeout := time.Duration(hc.Timeout) * time.Second
+	result := make(chan bool)
+	go healthcheckLoop(result, path, hc)
+
 	select {
 	case <-result:
-		logWithFields.Info("Healthcheck competed")
+		logWithFields.Debug("Healthcheck competed")
 	case <-time.After(timeout):
 		logWithFields.Fatal("Healthcheck timed out")
 	}

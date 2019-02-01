@@ -28,12 +28,14 @@ func runPostcondition(path string, pc load.Command, lock *sync.WaitGroup) {
 		"args":    pc.Args,
 	})
 
+	logWithFields.Info("Postcondition started")
+
 	command := exec.Command(pc.Name, pc.Args...)
 	command.Dir = buildPath(path)
 	if stdout, err := command.Output(); err != nil {
 		logWithFields.WithError(err).Fatal("Postcondition failed")
 	} else {
-		logWithFields.Info("Postcondition completed")
+		logWithFields.Debug("Postcondition completed")
 		logWithFields.Debug(string(stdout))
 	}
 

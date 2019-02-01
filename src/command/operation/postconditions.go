@@ -36,7 +36,7 @@ func runPostcondition(path string, pc load.Command, lock *sync.WaitGroup) {
 		logWithFields.WithError(err).Fatal("Postcondition failed")
 	} else {
 		logWithFields.Debug("Postcondition completed")
-		logWithFields.Debug(string(stdout))
+		log.Debug("Command output:\n" + string(stdout))
 	}
 
 	lock.Done()

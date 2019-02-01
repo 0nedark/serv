@@ -38,7 +38,7 @@ func healthcheckInit(path string, hc load.Healthcheck, lock *sync.WaitGroup) {
 
 	select {
 	case <-result:
-		logWithFields.Debug("Healthcheck competed")
+		logWithFields.Debug("Healthcheck completed")
 	case <-time.After(timeout):
 		logWithFields.Fatal("Healthcheck timed out")
 	}
@@ -61,10 +61,12 @@ func healthcheck(result chan bool, path string, hc load.Healthcheck) {
 
 	command := exec.Command(hc.Name, hc.Args...)
 	command.Dir = buildPath(path)
-	if stdout, err := command.Output(); err != nil {
+	stdout, err := command.Output()
+	if err != nil {
 		logWithFields.WithError(err).Debug("Healthcheck failed")
 	} else {
-		logWithFields.Debug(string(stdout))
 		result <- true
 	}
+
+	log.Debug("Command output:\n" + string(stdout))
 }

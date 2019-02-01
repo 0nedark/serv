@@ -23,7 +23,7 @@ func Start(service load.Service, lock *sync.WaitGroup) {
 		logWithFields.WithError(err).Fatal("Service start failed")
 	} else {
 		logWithFields.Debug("Service started")
-		logWithFields.Debug(string(stdout))
+		log.Debug("Command output:\n" + string(stdout))
 	}
 
 	lock.Done()

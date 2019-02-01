@@ -10,21 +10,20 @@ import (
 
 // Start the service
 func Start(service load.Service, lock *sync.WaitGroup) {
-	logWithFields := log.WithFields(log.Fields{
-		"command": service.Command.Name,
-		"args":    service.Command.Args,
-	})
-
+	logWithFields := log.WithField("command", service.Command)
 	logWithFields.Info("Service starting")
 
-	command := exec.Command(service.Command.Name, service.Command.Args...)
+	command := exec.Command("sh", "-c", service.Command)
 	command.Dir = buildPath(service.Path)
-	if stdout, err := command.Output(); err != nil {
+	stdout, err := command.Output()
+
+	if err != nil {
 		logWithFields.WithError(err).Fatal("Service start failed")
 	} else {
 		logWithFields.Debug("Service started")
-		log.Debug("Command output:\n" + string(stdout))
 	}
+
+	log.Debug("Command output:\n" + string(stdout))
 
 	lock.Done()
 }

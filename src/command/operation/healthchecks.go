@@ -25,11 +25,7 @@ func Healthchecks(service load.Service, lock *sync.WaitGroup) {
 }
 
 func healthcheckInit(path string, hc load.Healthcheck, lock *sync.WaitGroup) {
-	logWithFields := log.WithFields(log.Fields{
-		"command": hc.Name,
-		"args":    hc.Args,
-	})
-
+	logWithFields := log.WithField("command", hc.Command)
 	logWithFields.Info("Healthcheck started")
 
 	timeout := time.Duration(hc.Timeout) * time.Second
@@ -54,14 +50,12 @@ func healthcheckLoop(result chan bool, path string, hc load.Healthcheck) {
 }
 
 func healthcheck(result chan bool, path string, hc load.Healthcheck) {
-	logWithFields := log.WithFields(log.Fields{
-		"command": hc.Name,
-		"args":    hc.Args,
-	})
+	logWithFields := log.WithField("command", hc.Command)
 
-	command := exec.Command(hc.Name, hc.Args...)
+	command := exec.Command("sh", "-c", hc.Command)
 	command.Dir = buildPath(path)
 	stdout, err := command.Output()
+
 	if err != nil {
 		logWithFields.WithError(err).Debug("Healthcheck failed")
 	} else {

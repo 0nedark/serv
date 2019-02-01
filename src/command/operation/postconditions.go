@@ -22,22 +22,20 @@ func Postconditions(service load.Service, lock *sync.WaitGroup) {
 	lock.Done()
 }
 
-func runPostcondition(path string, pc load.Command, lock *sync.WaitGroup) {
-	logWithFields := log.WithFields(log.Fields{
-		"command": pc.Name,
-		"args":    pc.Args,
-	})
-
+func runPostcondition(path string, pc load.Postcondition, lock *sync.WaitGroup) {
+	logWithFields := log.WithField("command", pc.Command)
 	logWithFields.Info("Postcondition started")
 
-	command := exec.Command(pc.Name, pc.Args...)
+	command := exec.Command("sh", "-c", pc.Command)
 	command.Dir = buildPath(path)
-	if stdout, err := command.Output(); err != nil {
+	stdout, err := command.Output()
+	if err != nil {
 		logWithFields.WithError(err).Fatal("Postcondition failed")
 	} else {
 		logWithFields.Debug("Postcondition completed")
-		log.Debug("Command output:\n" + string(stdout))
 	}
+
+	log.Debug("Command output:\n" + string(stdout))
 
 	lock.Done()
 }

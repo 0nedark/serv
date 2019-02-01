@@ -1,7 +1,6 @@
 package operation
 
 import (
-	"os/exec"
 	"sync"
 	"time"
 
@@ -10,31 +9,37 @@ import (
 	"github.com/0nedark/serv/src/load"
 )
 
+type healthcheck struct {
+	Path    string
+	Command string
+	Sleep   int
+}
+
 // Healthchecks of the service
 func Healthchecks(service load.Service, lock *sync.WaitGroup) {
 	healthchecksLock := &sync.WaitGroup{}
 	defer healthchecksLock.Wait()
 
-	for _, hc := range service.Healthchecks {
+	for _, current := range service.Healthchecks {
 		healthchecksLock.Add(1)
-		go healthcheckInit(service.Path, hc, healthchecksLock)
+		timeout := time.Duration(current.Timeout) * time.Second
+		hc := healthcheck{service.Path, current.Command, current.Sleep}
+		go hc.start(timeout, healthchecksLock)
 	}
 
 	healthchecksLock.Wait()
 	lock.Done()
 }
 
-func healthcheckInit(path string, hc load.Healthcheck, lock *sync.WaitGroup) {
+func (hc healthcheck) start(timeout time.Duration, lock *sync.WaitGroup) {
 	logWithFields := log.WithFields(log.Fields{
-		"command": hc.Name,
-		"args":    hc.Args,
+		"context": hc.Path,
+		"command": hc.Command,
 	})
 
-	logWithFields.Info("Healthcheck started")
-
-	timeout := time.Duration(hc.Timeout) * time.Second
+	logWithFields.Info("Healthcheck starting")
 	result := make(chan bool)
-	go healthcheckLoop(result, path, hc)
+	go hc.loop(logWithFields, result)
 
 	select {
 	case <-result:
@@ -46,27 +51,24 @@ func healthcheckInit(path string, hc load.Healthcheck, lock *sync.WaitGroup) {
 	lock.Done()
 }
 
-func healthcheckLoop(result chan bool, path string, hc load.Healthcheck) {
+func (hc healthcheck) loop(logWithFields *log.Entry, result chan bool) {
 	for {
-		healthcheck(result, path, hc)
+		output := runCommand(
+			handleCommand(hc.Path, hc.Command),
+			handleHealthcheckError(logWithFields, result),
+		)
+
+		log.Debugf("Command output:\n%s", output)
 		time.Sleep(time.Duration(hc.Sleep) * time.Second)
 	}
 }
 
-func healthcheck(result chan bool, path string, hc load.Healthcheck) {
-	logWithFields := log.WithFields(log.Fields{
-		"command": hc.Name,
-		"args":    hc.Args,
-	})
-
-	command := exec.Command(hc.Name, hc.Args...)
-	command.Dir = buildPath(path)
-	stdout, err := command.Output()
-	if err != nil {
-		logWithFields.WithError(err).Debug("Healthcheck failed")
-	} else {
-		result <- true
+func handleHealthcheckError(logWithFields *log.Entry, result chan bool) errorHandler {
+	return func(err error) {
+		if err != nil {
+			logWithFields.WithError(err).Debug("Command failed")
+		} else {
+			result <- true
+		}
 	}
-
-	log.Debug("Command output:\n" + string(stdout))
 }

@@ -1,43 +1,44 @@
 package operation
 
 import (
-	"os/exec"
 	"sync"
 
 	"github.com/0nedark/serv/src/load"
 	log "github.com/sirupsen/logrus"
 )
 
+type postcondition struct {
+	Path    string
+	Command string
+}
+
 // Postconditions of the service
 func Postconditions(service load.Service, lock *sync.WaitGroup) {
 	postconditionsLock := &sync.WaitGroup{}
 	defer postconditionsLock.Wait()
 
-	for _, postcondition := range service.Postconditions {
+	for _, current := range service.Postconditions {
 		postconditionsLock.Add(1)
-		go runPostcondition(service.Path, postcondition, postconditionsLock)
+		pc := postcondition{service.Path, current.Command}
+		go pc.start(postconditionsLock)
 	}
 
 	postconditionsLock.Wait()
 	lock.Done()
 }
 
-func runPostcondition(path string, pc load.Command, lock *sync.WaitGroup) {
+func (pc postcondition) start(lock *sync.WaitGroup) {
 	logWithFields := log.WithFields(log.Fields{
-		"command": pc.Name,
-		"args":    pc.Args,
+		"context": pc.Path,
+		"command": pc.Command,
 	})
 
-	logWithFields.Info("Postcondition started")
+	logWithFields.Info("Postcondition starting")
+	output := runCommand(
+		handleCommand(pc.Path, pc.Command),
+		handleGenericError(logWithFields, "Postcondition"),
+	)
 
-	command := exec.Command(pc.Name, pc.Args...)
-	command.Dir = buildPath(path)
-	if stdout, err := command.Output(); err != nil {
-		logWithFields.WithError(err).Fatal("Postcondition failed")
-	} else {
-		logWithFields.Debug("Postcondition completed")
-		log.Debug("Command output:\n" + string(stdout))
-	}
-
+	log.Debugf("Command output:\n%s", output)
 	lock.Done()
 }

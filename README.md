@@ -45,11 +45,11 @@ groups are executed.
 group_a:
   - url: git@github.com:0nedark/repo-name.git
     path: ../B
-    command: {...}
+    command: echo test
     healthchecks: [{...}, ...]
     postconditions: [{...}, ...]
     
-  - command: {...}
+  - command: echo test
     healthchecks: [{...}, ...]
     postconditions: [{...}, ...]
 ```
@@ -63,7 +63,7 @@ conditions of the current group pass.
 ```yaml
 - url: git@github.com:0nedark/repo-name.git
   path: ../B
-  command: {...}
+  command: echo test
   healthchecks: [{...}, ...]
   postconditions: [{...}, ...]
 ```
@@ -78,28 +78,22 @@ the current working directory will be used as the context.
 
 #### command
 ```yaml
-command:
-  name: echo
-  args: [some, string]
+command: echo test
 ```
-Command defines a single command to be executed together with it's arguments, `name` defines the name of the cli command
-and `args` defines an array of strings where each string is an argument passed to the cli command. This should be used
-to run you startup script. If this command fails `serv` will terminate with error.
+Command defines a single shell command to be executed. This should be used to run you startup script. If this command fails `serv` will terminate with error.
 
 #### healthchecks
 ```yaml
 healthchecks:
-  - name: echo
-    args: [some, string]
+  - command: echo test
     timeout: 10
     sleep: 5
-  - name: cd
-    args: ['../temp']
+  - command: cd .
     timeout: 60
     sleep: 5
 ```
 
-A list of command like objects that are executed as soon as the `service` `command` returns with no errors. Each health
+A list of command like objects that are executed as soon as the `service`'s `command` returns with no errors. Each health
 check command in the current `group` is executed in parallel, repeatedly, every `sleep` number of seconds, until it
 either returns with success or a `timeout` is reached. If any of the health checks fail `serv` will terminate with
 error.
@@ -113,37 +107,27 @@ the current `group` is executed in parallel. If any of the post conditions fail 
 order: [group_a, group_b]
 groups:
   group_a:
-    - command:
-        name: echo
-        args: [starting, A]
+    - command: echo starting A
       healthchecks:
-        - name: echo
-          args: ["healthcheck A"]
+        - command: echo "healthcheck A"
           timeout: 10
           sleep: 5
       postconditions:
-        - name: echo
-          args: ["postcondition A"]
-    - url: git@github.com:0nedark/repo-name.git
+        - command: echo postcondition A
+    - url: https://github.com/0nedark/serv.git
       path: ../B
-      command:
-        name: echo
-        args: ["starting B"]
+      command: echo starting B
       healthchecks:
-        - name: echo
-          args: ["healthcheck B"]
+        - command: echo healthcheck B
           timeout: 60
           sleep: 5
 
   group_b:
-    - url: git@github.com:0nedark/repo-name.git
+    - url: https://github.com/0nedark/serv.git
       path: ../C
-      command:
-        name: echo
-        args: ["starting C"]
+      command: echo starting C
       healthchecks:
-        - name: echo
-          args: ["healthcheck C"]
+        - command: echo healthcheck C
           timeout: 60
           sleep: 5
 ```

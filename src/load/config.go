@@ -6,17 +6,16 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Command defines structure of bash command
-type Command struct {
-	Name string   `yaml:"name"`
-	Args []string `yaml:"args"`
+// Postcondition defines structure of post condition command
+type Postcondition struct {
+	Command string `yaml:"command"`
 }
 
 // Healthcheck defines structure of health check command
 type Healthcheck struct {
-	Command `yaml:",inline"`
-	Timeout int `yaml:"timeout"`
-	Sleep   int `yaml:"sleep"`
+	Command string `yaml:"command"`
+	Timeout int    `yaml:"timeout"`
+	Sleep   int    `yaml:"sleep"`
 }
 
 // Repository defines structure of single repository
@@ -28,9 +27,9 @@ type Repository struct {
 // Service defines structure of a single project
 type Service struct {
 	Repository     `yaml:",inline"`
-	Command          Command       `yaml:"command"`
-	Healthchecks   []Healthcheck `yaml:"healthchecks"`
-	Postconditions []Command     `yaml:"postconditions"`
+	Command        string          `yaml:"command"`
+	Healthchecks   []Healthcheck   `yaml:"healthchecks"`
+	Postconditions []Postcondition `yaml:"postconditions"`
 }
 
 // Groups defines structure of the groups section in serv yaml file

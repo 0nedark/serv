@@ -1,7 +1,6 @@
 package operation
 
 import (
-	"os/exec"
 	"sync"
 
 	"github.com/0nedark/serv/src/load"
@@ -10,20 +9,17 @@ import (
 
 // Start the service
 func Start(service load.Service, lock *sync.WaitGroup) {
-	logWithFields := log.WithField("command", service.Command)
+	logWithFields := log.WithFields(log.Fields{
+		"context": service.Path,
+		"command": service.Command,
+	})
+
 	logWithFields.Info("Service starting")
+	output := runCommand(
+		handleCommand(service.Path, service.Command),
+		handleGenericError(logWithFields, "Service"),
+	)
 
-	command := exec.Command("sh", "-c", service.Command)
-	command.Dir = buildPath(service.Path)
-	stdout, err := command.Output()
-
-	if err != nil {
-		logWithFields.WithError(err).Fatal("Service start failed")
-	} else {
-		logWithFields.Debug("Service started")
-	}
-
-	log.Debug("Command output:\n" + string(stdout))
-
+	log.Debugf("Command output:\n%s", output)
 	lock.Done()
 }

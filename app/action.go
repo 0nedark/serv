@@ -22,7 +22,7 @@ func (a Application) action(c *cli.Context) error {
 	file := c.GlobalString("file")
 	config, err := a.loadConfig(file, ioutil.ReadFile)
 	if err == nil {
-		a.verifyGroups(config.Order, config.Groups)
+		a.verifyGroups(config.Groups)
 		a.commandGroups(config.Order, config.Groups)
 	}
 

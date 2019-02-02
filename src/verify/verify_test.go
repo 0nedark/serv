@@ -7,8 +7,8 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestConfigLoading(t *testing.T) {
-	Convey("repositories.go", t, func() {
+func TestVerifyPackage(t *testing.T) {
+	Convey("package verify", t, func() {
 		Convey("emptyRepository", func() {
 			Convey("should return true if repository structure is empty", func() {
 				So(emptyRepository(load.Repository{}), ShouldBeTrue)

@@ -6,8 +6,12 @@ import (
 	"github.com/0nedark/serv/src/load"
 )
 
-func verifyGroup(group []load.Service, lock *sync.WaitGroup) {
-	for _, service := range group {
-		isRepository(service.Repository, lock)
+func verifyRepositories(repositories []load.Repository) {
+	lock := &sync.WaitGroup{}
+	defer lock.Wait()
+
+	for _, repository := range repositories {
+		lock.Add(1)
+		go verifyRepository(repository, lock)
 	}
 }

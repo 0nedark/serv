@@ -10,11 +10,18 @@ import (
 	git "gopkg.in/src-d/go-git.v4"
 )
 
-func isRepository(repository load.Repository, lock *sync.WaitGroup) {
-	if repository != (load.Repository{}) {
-		lock.Add(1)
-		go verifyRepository(repository, lock)
+func selectRepositories(services []load.Service, repositories []load.Repository) []load.Repository {
+	for _, service := range services {
+		if !emptyRepository(service.Repository) {
+			repositories = append(repositories, service.Repository)
+		}
 	}
+
+	return repositories
+}
+
+func emptyRepository(repository load.Repository) bool {
+	return repository == (load.Repository{})
 }
 
 func verifyRepository(repository load.Repository, lock *sync.WaitGroup) {

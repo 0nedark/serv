@@ -6,8 +6,8 @@ import (
 	"github.com/0nedark/serv/src/load"
 )
 
-// Groups verifies that repos in the group are present
-func Groups(order []string, groups map[string][]load.Service) {
+// Groups verifies that repositories in the group are present
+func Groups(order []string, groups load.Groups) {
 	lock := &sync.WaitGroup{}
 	defer lock.Wait()
 

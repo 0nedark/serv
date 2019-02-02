@@ -30,8 +30,11 @@ type Service struct {
 	Postconditions []Postcondition `yaml:"postconditions"`
 }
 
+// Services defines the structure for array of services
+type Services = []Service
+
 // Groups defines structure of the groups section in serv yaml file
-type Groups = map[string][]Service
+type Groups = map[string]Services
 
 // Config defines structure of the serv yaml file
 type Config struct {

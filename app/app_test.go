@@ -10,13 +10,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getConfigMock(string, load.ReadFileFunc) (load.Config, error) {
+func getConfigStub(string, load.ReadFileFunc) (load.Config, error) {
 	return load.Config{}, nil
+}
+
+func groupsStub(order []string, groups load.Groups) {
+
 }
 
 func TestCommandIsStarting(t *testing.T) {
 	Convey("Flags are handled correctly", t, func() {
-		application := NewApplication(getConfigMock)
+		application := NewApplication(getConfigStub, groupsStub, groupsStub)
 
 		Convey("should set log level to debug with --verbose", func() {
 			application.Run([]string{"pwd", "--verbose"})

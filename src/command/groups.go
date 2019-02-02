@@ -6,7 +6,7 @@ import (
 )
 
 // Groups to be started
-func Groups(order []string, groups map[string][]load.Service) {
+func Groups(order []string, groups load.Groups) {
 	for _, key := range order {
 		log.WithField("name", key).Info("Running group")
 		commandGroup(groups[key])

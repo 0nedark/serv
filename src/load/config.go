@@ -1,8 +1,6 @@
 package load
 
 import (
-	"io/ioutil"
-
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -41,14 +39,14 @@ type Config struct {
 	Groups Groups   `yaml:"groups"`
 }
 
-type fileReader = func(string) ([]byte, error)
+// ReadFileFunc defines read file function signature
+type ReadFileFunc = func(string) ([]byte, error)
 
-// GetConfig the specified yml file into the provided structure
-func GetConfig(file string) (Config, error) {
-	return config(file, ioutil.ReadFile)
-}
+// ConfigFunc defines the config function signature
+type ConfigFunc = func(string, ReadFileFunc) (Config, error)
 
-func config(file string, readFile fileReader) (Config, error) {
+// NewConfig the specified yml file
+func NewConfig(file string, readFile ReadFileFunc) (Config, error) {
 	raw, err := readFile(file)
 	if err != nil {
 		return Config{}, err

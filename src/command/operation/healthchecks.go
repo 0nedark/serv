@@ -31,6 +31,15 @@ func Healthchecks(service load.Service, lock *sync.WaitGroup) {
 	lock.Done()
 }
 
+func handleHealthcheckDone(logWithFields *log.Entry, success <-chan bool, timeout time.Duration) {
+	select {
+	case <-success:
+		logWithFields.Debug("Healthcheck completed")
+	case <-time.After(timeout):
+		logWithFields.Fatal("Healthcheck timed out")
+	}
+}
+
 func (hc healthcheck) start(timeout time.Duration, lock *sync.WaitGroup) {
 	logWithFields := log.WithFields(log.Fields{
 		"context": hc.Path,
@@ -38,24 +47,17 @@ func (hc healthcheck) start(timeout time.Duration, lock *sync.WaitGroup) {
 	})
 
 	logWithFields.Info("Healthcheck starting")
-	result := make(chan bool)
-	go hc.loop(logWithFields, result)
-
-	select {
-	case <-result:
-		logWithFields.Debug("Healthcheck completed")
-	case <-time.After(timeout):
-		logWithFields.Fatal("Healthcheck timed out")
-	}
-
+	success := make(chan bool)
+	go hc.loop(logWithFields, success)
+	handleHealthcheckDone(logWithFields, success, timeout)
 	lock.Done()
 }
 
-func (hc healthcheck) loop(logWithFields *log.Entry, result chan bool) {
+func (hc healthcheck) loop(logWithFields *log.Entry, success chan<- bool) {
 	for {
 		output := runCommand(
 			handleCommand(hc.Path, hc.Command),
-			handleHealthcheckError(logWithFields, result),
+			handleHealthcheckError(logWithFields, success),
 		)
 
 		log.Debugf("Command output:\n%s", output)
@@ -63,12 +65,12 @@ func (hc healthcheck) loop(logWithFields *log.Entry, result chan bool) {
 	}
 }
 
-func handleHealthcheckError(logWithFields *log.Entry, result chan bool) errorHandler {
+func handleHealthcheckError(logWithFields *log.Entry, success chan<- bool) errorHandler {
 	return func(err error) {
 		if err != nil {
 			logWithFields.WithError(err).Debug("Command failed")
 		} else {
-			result <- true
+			success <- true
 		}
 	}
 }

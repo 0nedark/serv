@@ -41,16 +41,23 @@ type Config struct {
 	Groups Groups   `yaml:"groups"`
 }
 
+type fileReader = func(string) ([]byte, error)
+
 // GetConfig the specified yml file into the provided structure
-func GetConfig(file string, input *Config) error {
-	raw, err := ioutil.ReadFile(file)
+func GetConfig(file string) (Config, error) {
+	return config(file, ioutil.ReadFile)
+}
+
+func config(file string, readFile fileReader) (Config, error) {
+	raw, err := readFile(file)
 	if err != nil {
-		return err
+		return Config{}, err
 	}
 
-	if err = yaml.Unmarshal(raw, input); err != nil {
-		return err
+	config := Config{}
+	if err = yaml.Unmarshal(raw, &config); err != nil {
+		return Config{}, err
 	}
 
-	return nil
+	return config, nil
 }

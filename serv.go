@@ -52,13 +52,12 @@ func action(c *cli.Context) error {
 		log.SetLevel(log.ErrorLevel)
 	}
 
-	serv := load.Config{}
-	if err := load.GetConfig(c.GlobalString("file"), &serv); err != nil {
-		return err
+	file := c.GlobalString("file")
+	config, err := load.GetConfig(file)
+	if err == nil {
+		verify.Groups(config.Order, config.Groups)
+		command.Groups(config.Order, config.Groups)
 	}
 
-	verify.Groups(serv.Order, serv.Groups)
-	command.Groups(serv.Order, serv.Groups)
-
-	return nil
+	return err
 }

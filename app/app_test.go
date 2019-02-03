@@ -14,14 +14,14 @@ func getConfigStub(string, load.ReadFileFunc) (load.Config, error) {
 	return load.Config{}, nil
 }
 
-func verifyGroupsStub(groups load.Groups)                  {}
+func eachStub(groups load.Groups)                          {}
 func commandGroupsStub(order []string, groups load.Groups) {}
 
 func TestAppPackage(t *testing.T) {
 	Convey("package app", t, func() {
 		application := NewApplication(
 			getConfigStub,
-			verifyGroupsStub,
+			eachStub,
 			commandGroupsStub,
 		)
 

@@ -11,7 +11,7 @@ import (
 type Application struct {
 	instance      *cli.App
 	loadConfig    load.ConfigFunc
-	verifyGroups  verify.GroupsFunc
+	verifyEach    verify.EachFunc
 	commandGroups command.GroupsFunc
 }
 
@@ -23,10 +23,10 @@ func (a Application) Run(args []string) error {
 // NewApplication constructs instance of application
 func NewApplication(
 	loadConfig load.ConfigFunc,
-	verifyGroups verify.GroupsFunc,
+	verifyEach verify.EachFunc,
 	commandGroups command.GroupsFunc,
 ) Application {
-	application := Application{cli.NewApp(), loadConfig, verifyGroups, commandGroups}
+	application := Application{cli.NewApp(), loadConfig, verifyEach, commandGroups}
 	application.configure()
 
 	return application

@@ -1,12 +1,12 @@
-package clone
+package repository
 
 import (
 	log "github.com/sirupsen/logrus"
 	git "gopkg.in/src-d/go-git.v4"
 )
 
-// Repository to be cloned in the specified path
-func Repository(url, path string) {
+// Clone to be cloned in the specified path
+func Clone(url, path string) {
 	logWithFields := log.WithFields(log.Fields{
 		"url":  url,
 		"path": path,

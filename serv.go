@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	application := app.NewApplication(load.NewConfig, verify.Groups, command.Groups)
+	application := app.NewApplication(load.NewConfig, verify.Each, command.Groups)
 	if err := application.Run(os.Args); err != nil {
 		log.WithError(err).Fatal("Unrecoverable error encountered")
 	}

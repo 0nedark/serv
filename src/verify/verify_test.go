@@ -1,6 +1,7 @@
 package verify
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/0nedark/serv/src/load"
@@ -9,40 +10,44 @@ import (
 
 func TestVerifyPackage(t *testing.T) {
 	Convey("package verify", t, func() {
-		Convey("emptyRepository", func() {
-			Convey("should return true if repository structure is empty", func() {
-				So(emptyRepository(load.Repository{}), ShouldBeTrue)
+		openCalled := false
+		open = func(path string) (string, error) {
+			openCalled = true
+			return "", nil
+		}
+
+		cloneCalled := false
+		clone = func(url, path string) { cloneCalled = true }
+
+		Convey("Each", func() {
+			groups := load.Groups{}
+
+			Convey("should not try to open service with no repository", func() {
+				groups["test"] = load.Services{load.Service{}}
+				Each(groups)
+				So(openCalled, ShouldBeFalse)
 			})
 
-			Convey("should return false if repository structure is not empty", func() {
+			Convey("should try to open service with repository", func() {
 				repository := load.Repository{URL: "git repo url", Path: ".."}
-				So(emptyRepository(repository), ShouldBeFalse)
-			})
-		})
-
-		Convey("selectRepositories", func() {
-			repositories := make([]load.Repository, 0)
-
-			Convey("should select only non empty repositories", func() {
-				services := load.Services{
-					load.Service{Repository: load.Repository{}},
-					load.Service{Repository: load.Repository{URL: "git repo url", Path: ".."}},
-				}
-
-				filtered := selectRepositories(services, repositories)
-				So(filtered[0], ShouldResemble, services[1].Repository)
+				groups["test"] = load.Services{load.Service{Repository: repository}}
+				Each(groups)
+				So(openCalled, ShouldBeTrue)
 			})
 
-			Convey("should remove everything if no repositories are found", func() {
-				services := load.Services{load.Service{}, load.Service{}}
-				filtered := selectRepositories(services, repositories)
-				So(filtered, ShouldBeEmpty)
+			Convey("should try to clone service if it doesn't exist locally", func() {
+				repository := load.Repository{URL: "git repo url", Path: ".."}
+				groups["test"] = load.Services{load.Service{Repository: repository}}
+				open = func(path string) (string, error) { return "", errors.New("") }
+				Each(groups)
+				So(cloneCalled, ShouldBeTrue)
 			})
 
-			Convey("should return empty array on empty service array", func() {
-				services := load.Services{}
-				filtered := selectRepositories(services, repositories)
-				So(filtered, ShouldBeEmpty)
+			Convey("should not try to clone service if no repository was provided", func() {
+				groups["test"] = load.Services{load.Service{}}
+				open = func(path string) (string, error) { return "", errors.New("") }
+				Each(groups)
+				So(cloneCalled, ShouldBeFalse)
 			})
 		})
 	})

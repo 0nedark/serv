@@ -3,11 +3,19 @@ package app
 import (
 	"io/ioutil"
 
+	"github.com/0nedark/serv/src/command"
+	"github.com/0nedark/serv/src/load"
+	"github.com/0nedark/serv/src/verify"
+
 	log "github.com/sirupsen/logrus"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-func (a Application) action(c *cli.Context) error {
+var newConfig = load.NewConfig
+var verifyEach = verify.Each
+var commandGroups = command.Groups
+
+func action(c *cli.Context) error {
 	log.SetFormatter(&log.TextFormatter{
 		DisableTimestamp: true,
 		QuoteEmptyFields: true,
@@ -20,10 +28,10 @@ func (a Application) action(c *cli.Context) error {
 	}
 
 	file := c.GlobalString("file")
-	config, err := a.loadConfig(file, ioutil.ReadFile)
+	config, err := newConfig(file, ioutil.ReadFile)
 	if err == nil {
-		a.verifyEach(config.Groups)
-		a.commandGroups(config.Order, config.Groups)
+		verifyEach(config.Groups)
+		commandGroups(config.Order, config.Groups)
 	}
 
 	return err

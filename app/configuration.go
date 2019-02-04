@@ -2,12 +2,14 @@ package app
 
 import cli "gopkg.in/urfave/cli.v1"
 
-func (a Application) configure() {
-	a.instance.Name = "serv"
-	a.instance.Usage = "Orchestrate the startup of your services"
-	a.instance.Version = "1.0.0"
-	a.instance.Action = a.action
-	a.instance.Flags = []cli.Flag{
+// Configure the cli application
+func Configure() *cli.App {
+	app := cli.NewApp()
+	app.Name = "serv"
+	app.Usage = "Orchestrate the startup of your services"
+	app.Version = "1.0.0"
+	app.Action = action
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "file, f",
 			Usage: "specifies the serv.yml file",
@@ -22,4 +24,6 @@ func (a Application) configure() {
 			Usage: "show only errors logs (ignored if verbose flag is provided)",
 		},
 	}
+
+	return app
 }

@@ -7,8 +7,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var run = app.Configure().Run
+var fatal = log.Fatal
+
 func main() {
-	if err := app.Configure().Run(os.Args); err != nil {
-		log.WithError(err).Fatal("Unrecoverable error encountered")
+	if err := run(os.Args); err != nil {
+		fatal(err.Error())
 	}
 }

@@ -55,12 +55,11 @@ func (hc healthcheck) start(timeout time.Duration, lock *sync.WaitGroup) {
 
 func (hc healthcheck) loop(logWithFields *log.Entry, success chan<- bool) {
 	for {
-		output := runCommand(
+		runCommand(
 			handleCommand(hc.Path, hc.Command),
 			handleHealthcheckError(logWithFields, success),
 		)
 
-		log.Debugf("Command output:\n%s", output)
 		time.Sleep(time.Duration(hc.Sleep) * time.Second)
 	}
 }

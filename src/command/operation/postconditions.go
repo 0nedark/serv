@@ -34,11 +34,10 @@ func (pc postcondition) start(lock *sync.WaitGroup) {
 	})
 
 	logWithFields.Info("Postcondition starting")
-	output := runCommand(
+	runCommand(
 		handleCommand(pc.Path, pc.Command),
 		handleGenericError(logWithFields, "Postcondition"),
 	)
 
-	log.Debugf("Command output:\n%s", output)
 	lock.Done()
 }

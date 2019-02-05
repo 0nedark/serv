@@ -15,11 +15,10 @@ func Start(service load.Service, lock *sync.WaitGroup) {
 	})
 
 	logWithFields.Info("Service starting")
-	output := runCommand(
+	runCommand(
 		handleCommand(service.Path, service.Command),
 		handleGenericError(logWithFields, "Service"),
 	)
 
-	log.Debugf("Command output:\n%s", output)
 	lock.Done()
 }

@@ -7,7 +7,7 @@ import (
 
 var gitClone = git.PlainClone
 
-// Clone to be cloned in the specified path
+// Clone git repository in the specified path
 func Clone(url, path string) (string, error) {
 	log.WithFields(log.Fields{
 		"url":  url,

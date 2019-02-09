@@ -1,63 +1,23 @@
 package load
 
 import (
+	"io/ioutil"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Postcondition defines structure of post condition command
-type Postcondition struct {
-	Command string `yaml:"command"`
-}
+var read = ioutil.ReadFile
 
-// Healthcheck defines structure of health check command
-type Healthcheck struct {
-	Command string `yaml:"command"`
-	Timeout int    `yaml:"timeout"`
-	Sleep   int    `yaml:"sleep"`
-}
-
-// Repository defines structure of single repository
-type Repository struct {
-	URL  string `yaml:"url"`
-	Path string `yaml:"path"`
-}
-
-// Service defines structure of a single project
-type Service struct {
-	Repository     `yaml:",inline"`
-	Command        string          `yaml:"command"`
-	Healthchecks   []Healthcheck   `yaml:"healthchecks"`
-	Postconditions []Postcondition `yaml:"postconditions"`
-}
-
-// Services defines the structure for array of services
-type Services = []Service
-
-// Groups defines structure of the groups section in serv yaml file
-type Groups = map[string]Services
-
-// Config defines structure of the serv yaml file
-type Config struct {
-	Order  []string `yaml:"order"`
-	Groups Groups   `yaml:"groups"`
-}
-
-// ReadFileFunc defines read file function signature
-type ReadFileFunc = func(string) ([]byte, error)
-
-// ConfigFunc defines the config function signature
-type ConfigFunc = func(string, ReadFileFunc) (Config, error)
-
-// NewConfig the specified yml file
-func NewConfig(file string, readFile ReadFileFunc) (Config, error) {
-	raw, err := readFile(file)
+// Config the specified yml file
+func Config(file string) (ConfigFile, error) {
+	raw, err := read(file)
 	if err != nil {
-		return Config{}, err
+		return ConfigFile{}, err
 	}
 
-	config := Config{}
+	config := ConfigFile{}
 	if err = yaml.Unmarshal(raw, &config); err != nil {
-		return Config{}, err
+		return ConfigFile{}, err
 	}
 
 	return config, nil

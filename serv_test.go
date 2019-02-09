@@ -13,7 +13,7 @@ func TestMainPackage(t *testing.T) {
 		fatal = func(args ...interface{}) { fatalCalled = true }
 
 		Convey("main function should complete with no errors", func() {
-			run = func(args []string) error {
+			runAppWith = func(args []string) error {
 				return nil
 			}
 
@@ -22,7 +22,7 @@ func TestMainPackage(t *testing.T) {
 		})
 
 		Convey("main function should log fatal errors", func() {
-			run = func(args []string) error {
+			runAppWith = func(args []string) error {
 				return errors.New("test")
 			}
 

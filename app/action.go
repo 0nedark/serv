@@ -1,8 +1,6 @@
 package app
 
 import (
-	"io/ioutil"
-
 	"github.com/0nedark/serv/src/command"
 	"github.com/0nedark/serv/src/load"
 	"github.com/0nedark/serv/src/verify"
@@ -11,7 +9,7 @@ import (
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-var newConfig = load.NewConfig
+var loadConfig = load.Config
 var verifyEach = verify.Each
 var commandGroups = command.Groups
 
@@ -28,7 +26,7 @@ func action(c *cli.Context) error {
 	}
 
 	file := c.GlobalString("file")
-	config, err := newConfig(file, ioutil.ReadFile)
+	config, err := loadConfig(file)
 	if err == nil {
 		verifyEach(config.Groups)
 		commandGroups(config.Order, config.Groups)

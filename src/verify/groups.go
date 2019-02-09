@@ -27,15 +27,29 @@ func Each(groups load.Groups) {
 var open = repository.Open
 var clone = repository.Clone
 
-func verify(URL, Path string, lock *sync.WaitGroup) {
-	if remote, err := open(Path); err != nil {
-		clone(URL, Path)
+func verify(url, path string, lock *sync.WaitGroup) {
+	if remote, err := open(path); err != nil {
+		cloneRepository(url, path)
 	} else {
 		log.WithFields(log.Fields{
 			"url":  remote,
-			"path": Path,
+			"path": path,
 		}).Debug("Repository exists")
 	}
 
 	lock.Done()
+}
+
+func cloneRepository(url, path string) {
+	logWithFields := log.WithFields(log.Fields{
+		"url":  url,
+		"path": path,
+	})
+
+	msg, err := clone(url, path)
+	if err != nil {
+		logWithFields.WithError(err).Fatal(msg)
+	}
+
+	logWithFields.Debug(msg)
 }

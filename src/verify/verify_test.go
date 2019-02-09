@@ -17,7 +17,10 @@ func TestVerifyPackage(t *testing.T) {
 		}
 
 		cloneCalled := false
-		clone = func(url, path string) { cloneCalled = true }
+		clone = func(url, path string) (string, error) {
+			cloneCalled = true
+			return "", nil
+		}
 
 		Convey("Each", func() {
 			groups := load.Groups{}

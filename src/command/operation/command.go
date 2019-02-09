@@ -17,16 +17,19 @@ func buildPath(dir string) string {
 	return path.Join(cwd, dir)
 }
 
-type commandHandler = func() (string, error)
+type commandHandler = func() error
 type errorHandler = func(error)
 
 func handleCommand(path, command string) commandHandler {
-	return func() (string, error) {
+	return func() error {
 		exec := exec.Command("sh", "-c", command)
 		exec.Dir = buildPath(path)
-		stdout, err := exec.Output()
+		if log.IsLevelEnabled(log.DebugLevel) {
+			exec.Stderr = os.Stderr
+			exec.Stdout = os.Stdout
+		}
 
-		return string(stdout), err
+		return exec.Run()
 	}
 }
 
@@ -40,9 +43,6 @@ func handleGenericError(logWithFields *log.Entry, prefix string) errorHandler {
 	}
 }
 
-func runCommand(handleCommand commandHandler, handleError errorHandler) string {
-	output, err := handleCommand()
-	handleError(err)
-
-	return output
+func runCommand(handleCommand commandHandler, handleError errorHandler) {
+	handleError(handleCommand())
 }
